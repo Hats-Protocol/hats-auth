@@ -16,8 +16,6 @@ contract HatsOwnedTest is HatsAuthTestSetup {
 
     function setUp() public override {
         super.setUp();
-        hatsAddress = address(0x4a15);
-        ownerHat = uint256(1);
 
         mockHatsOwned = new MockHatsOwned(ownerHat, hatsAddress);
     }

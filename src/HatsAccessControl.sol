@@ -65,12 +65,17 @@ abstract contract HatsAccessControl is Context {
         bytes32 indexed newAdminRole
     );
 
+    event HatsContractChanged(
+        address previousHatsContract,
+        address newHatsContract
+    );
+
     struct RoleData {
         uint256 hat;
         bytes32 adminRole;
     }
 
-    IHats internal HATS;
+    IHats private HATS;
 
     mapping(bytes32 => RoleData) private _roles;
 
@@ -119,6 +124,10 @@ abstract contract HatsAccessControl is Context {
         }
     }
 
+    function hatsContract() public view virtual returns (address) {
+        return address(HATS);
+    }
+
     /**
      * @dev Returns the admin role that controls `role`. See {grantRole} and
      * {revokeRole}.
@@ -164,6 +173,34 @@ abstract contract HatsAccessControl is Context {
         onlyRole(getRoleAdmin(role))
     {
         _revokeRole(role, hat);
+    }
+
+    /**
+     * @dev Points to a new Hats Protocol implementation
+     *
+     * Emits a {RoleAdminChanged} event.
+     */
+
+    /**
+     * @dev Points to a new Hats Protocol implementation
+     *
+     * Only callable by the wearer of the default admin role's hat
+     *
+     * Emits a {RoleAdminChanged} event.
+     */
+    function changeHatsContract(address newHatsContract)
+        public
+        virtual
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        _changeHatsContract(newHatsContract);
+    }
+
+    function _changeHatsContract(address newHatsContract) public virtual {
+        address previousHatsContract = address(HATS);
+        HATS = IHats(newHatsContract);
+
+        emit HatsContractChanged(previousHatsContract, newHatsContract);
     }
 
     /**
