@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0
 pragma solidity >=0.8.13;
 
-import "./interfaces/IHats.sol";
+import "./Interfaces/IHats.sol";
 
 /// @notice Single owner authorization mixin using Hats Protocol
 /// @dev Forked from solmate (https://github.com/transmissions11/solmate/blob/main/src/auth/Owned.sol)
