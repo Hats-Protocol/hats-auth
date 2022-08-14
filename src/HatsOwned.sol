@@ -13,21 +13,18 @@ abstract contract HatsOwned {
 
     event OwnerHatUpdated(
         uint256 indexed ownerHat,
-        address indexed hatsContract
+        address indexed hatsAddress
     );
 
     /*//////////////////////////////////////////////////////////////
                             OWNERSHIP STORAGE
     //////////////////////////////////////////////////////////////*/
 
-    IHats internal hatsContract;
+    IHats internal HATS;
     uint256 public ownerHat;
 
     modifier onlyOwner() virtual {
-        require(
-            hatsContract.isWearerOfHat(msg.sender, ownerHat),
-            "UNAUTHORIZED"
-        );
+        require(HATS.isWearerOfHat(msg.sender, ownerHat), "UNAUTHORIZED");
 
         _;
     }
@@ -38,7 +35,7 @@ abstract contract HatsOwned {
 
     constructor(uint256 _ownerHat, address _hatsContract) {
         ownerHat = _ownerHat;
-        hatsContract = IHats(_hatsContract);
+        HATS = IHats(_hatsContract);
 
         emit OwnerHatUpdated(_ownerHat, _hatsContract);
     }
@@ -64,8 +61,8 @@ abstract contract HatsOwned {
 
         IHats hats = IHats(_hatsContract);
 
-        if (hatsContract != hats) {
-            hatsContract = hats;
+        if (HATS != hats) {
+            HATS = hats;
             // max of 2, so will never overflow
             unchecked {
                 ++changes;
@@ -82,6 +79,6 @@ abstract contract HatsOwned {
     //////////////////////////////////////////////////////////////*/
 
     function getHatsContract() public view returns (address) {
-        return address(hatsContract);
+        return address(HATS);
     }
 }
