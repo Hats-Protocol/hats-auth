@@ -6,4 +6,9 @@ interface IHats {
         external
         view
         returns (bool);
+
+    function isAdminOfHat(address _user, uint256 _hatId)
+        external
+        view
+        returns (bool);
 }
