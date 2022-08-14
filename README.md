@@ -6,7 +6,7 @@
 
 A fork of [solmate's `Owned.sol`](https://github.com/transmissions11/solmate/blob/main/src/auth/Owned.sol) that grants ownership of an inhereting contract to the wearer of a given [hat](https://github.com/Hats-Protocol/hats-protocol).
 
-`HatsOwned.sol` preserves the name of the `onlyOwner` modifier, so switching from `Owned.sol` only requires inhereting the new contract. No other code changes required.
+`HatsOwned.sol` preserves the name of the `onlyOwner` modifier, so switching from `Owned.sol` only requires inhereting the new contract and adjusting the constructor to set `uint256 ownerHat` rather than `address owner`. No other code changes required.
 
 ## HatsOwnable
 
