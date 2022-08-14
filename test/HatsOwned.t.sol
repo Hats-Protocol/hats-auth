@@ -1,40 +1,21 @@
 // SPDX-License-Identifier: CC0
 pragma solidity >=0.8.0;
 
-import "forge-std/Test.sol";
 import "./mocks/MockHatsOwned.sol";
+import "./HatsAuthTestSetup.sol";
 
 // import "../src/Interfaces/IHats.sol";
 
-contract HatsOwnedTest is Test {
+contract HatsOwnedTest is HatsAuthTestSetup {
     MockHatsOwned mockHatsOwned;
-    address hatsAddress;
-    address newHatsAddress;
-    uint256 ownerHat;
-    uint256 nonOwnerHat;
-    uint256 newOwnerHat;
-
-    bytes mockIsWearerCall;
 
     event OwnerHatUpdated(
         uint256 indexed ownerHat,
         address indexed hatsContract
     );
 
-    function encodeIsWearerCall(uint256 hatId)
-        public
-        view
-        returns (bytes memory)
-    {
-        return
-            abi.encodeWithSignature(
-                "isWearerOfHat(address,uint256)",
-                address(this),
-                hatId
-            );
-    }
-
-    function setUp() public {
+    function setUp() public override {
+        super.setUp();
         hatsAddress = address(0x4a15);
         ownerHat = uint256(1);
 
@@ -42,8 +23,8 @@ contract HatsOwnedTest is Test {
     }
 
     function testDeploy() public {
-        // vm.expectEmit(true, true, false, true);
-        // emit OwnerHatUpdated(ownerHat, hatsAddress);
+        vm.expectEmit(true, true, false, true);
+        emit OwnerHatUpdated(ownerHat, hatsAddress);
 
         mockHatsOwned = new MockHatsOwned(ownerHat, hatsAddress);
 
@@ -54,9 +35,7 @@ contract HatsOwnedTest is Test {
     function testSetOwnerHat() public {
         newOwnerHat = uint256(2);
 
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+        mockIsWearerCall(ownerHat, true);
 
         vm.expectEmit(true, true, false, true);
         emit OwnerHatUpdated(newOwnerHat, hatsAddress);
@@ -70,9 +49,7 @@ contract HatsOwnedTest is Test {
     function testSetHatsContract() public {
         newHatsAddress = address(0x4a152);
 
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+        mockIsWearerCall(ownerHat, true);
 
         vm.expectEmit(true, true, false, true);
         emit OwnerHatUpdated(ownerHat, newHatsAddress);
@@ -87,9 +64,7 @@ contract HatsOwnedTest is Test {
         newOwnerHat = uint256(2);
         newHatsAddress = address(0x4a152);
 
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+        mockIsWearerCall(ownerHat, true);
 
         vm.expectEmit(true, true, false, true);
         emit OwnerHatUpdated(newOwnerHat, newHatsAddress);
@@ -101,9 +76,7 @@ contract HatsOwnedTest is Test {
     }
 
     function testSetOwnerNoChanges() public {
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+        mockIsWearerCall(ownerHat, true);
 
         vm.expectRevert("NO CHANGES");
 
@@ -111,17 +84,13 @@ contract HatsOwnedTest is Test {
     }
 
     function testCallFunctionAsOwner() public {
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+        mockIsWearerCall(ownerHat, true);
 
         mockHatsOwned.updateFlag();
     }
 
     function testCallFunctionAsNonOwner() public {
-        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
-        mockIsWearerCall = encodeIsWearerCall(ownerHat);
-        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(false));
+        mockIsWearerCall(ownerHat, false);
 
         vm.expectRevert("UNAUTHORIZED");
         mockHatsOwned.updateFlag();
