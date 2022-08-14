@@ -59,9 +59,20 @@ abstract contract HatsAccessControl is Context {
         address indexed sender
     );
 
+    event RoleAdminChanged(
+        bytes32 indexed role,
+        bytes32 indexed previousAdminRole,
+        bytes32 indexed newAdminRole
+    );
+
+    struct RoleData {
+        uint256 hat;
+        bytes32 adminRole;
+    }
+
     IHats internal HATS;
 
-    mapping(bytes32 => uint256) private _roleHats;
+    mapping(bytes32 => RoleData) private _roles;
 
     bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
 
@@ -84,7 +95,7 @@ abstract contract HatsAccessControl is Context {
         virtual
         returns (bool)
     {
-        return HATS.isWearerOfHat(account, _roleHats[role]);
+        return HATS.isWearerOfHat(account, _roles[role].hat);
     }
 
     /**
@@ -104,8 +115,18 @@ abstract contract HatsAccessControl is Context {
      */
     function _checkRole(bytes32 role, address account) internal view virtual {
         if (!hasRole(role, account)) {
-            revert NotWearingRoleHat(role, _roleHats[role], account);
+            revert NotWearingRoleHat(role, _roles[role].hat, account);
         }
+    }
+
+    /**
+     * @dev Returns the admin role that controls `role`. See {grantRole} and
+     * {revokeRole}.
+     *
+     * To change a role's admin, use {_setRoleAdmin}.
+     */
+    function getRoleAdmin(bytes32 role) public view virtual returns (bytes32) {
+        return _roles[role].adminRole;
     }
 
     /**
@@ -120,11 +141,11 @@ abstract contract HatsAccessControl is Context {
      *
      * May emit a {RoleGranted} event.
      */
-    function grantRole(bytes32 role, uint256 hat) public virtual {
-        address account = _msgSender();
-        if (!HATS.isAdminOfHat(account, hat)) {
-            revert NotWearingRoleHat(role, hat, account);
-        }
+    function grantRole(bytes32 role, uint256 hat)
+        public
+        virtual
+        onlyRole(getRoleAdmin(role))
+    {
         _grantRole(role, hat);
     }
 
@@ -137,12 +158,23 @@ abstract contract HatsAccessControl is Context {
      *
      * - the caller must wear ``role``'s hat's admin hat.
      */
-    function revokeRole(bytes32 role, uint256 hat) public virtual {
-        address account = _msgSender();
-        if (!HATS.isAdminOfHat(account, hat)) {
-            revert NotWearingRoleHat(role, hat, account);
-        }
+    function revokeRole(bytes32 role, uint256 hat)
+        public
+        virtual
+        onlyRole(getRoleAdmin(role))
+    {
         _revokeRole(role, hat);
+    }
+
+    /**
+     * @dev Sets `adminRole` as ``role``'s admin role.
+     *
+     * Emits a {RoleAdminChanged} event.
+     */
+    function _setRoleAdmin(bytes32 role, bytes32 adminRole) internal virtual {
+        bytes32 previousAdminRole = getRoleAdmin(role);
+        _roles[role].adminRole = adminRole;
+        emit RoleAdminChanged(role, previousAdminRole, adminRole);
     }
 
     /**
@@ -151,8 +183,8 @@ abstract contract HatsAccessControl is Context {
      * Internal function without access restriction.
      */
     function _grantRole(bytes32 role, uint256 hat) internal virtual {
-        if (_roleHats[role] != hat) {
-            _roleHats[role] = hat;
+        if (_roles[role].hat != hat) {
+            _roles[role].hat = hat;
             emit RoleGranted(role, hat, _msgSender());
         }
     }
@@ -163,8 +195,8 @@ abstract contract HatsAccessControl is Context {
      * Internal function without access restriction.
      */
     function _revokeRole(bytes32 role, uint256 hat) internal virtual {
-        if (_roleHats[role] == hat) {
-            _roleHats[role] = 0;
+        if (_roles[role].hat == hat) {
+            _roles[role].hat = 0;
             emit RoleRevoked(role, hat, _msgSender());
         }
     }
