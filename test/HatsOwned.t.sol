@@ -100,6 +100,16 @@ contract HatsOwnedTest is Test {
         assertEq(mockHatsOwned.getHatsContract(), newHatsAddress);
     }
 
+    function testSetOwnerNoChanges() public {
+        // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
+        mockIsWearerCall = encodeIsWearerCall(ownerHat);
+        vm.mockCall(hatsAddress, mockIsWearerCall, abi.encode(true));
+
+        vm.expectRevert("NO CHANGES");
+
+        mockHatsOwned.setOwnerHat(ownerHat, hatsAddress);
+    }
+
     function testCallFunctionAsOwner() public {
         // encode mock call to hats.isWearerOfHat() inside of onlyOwner modifier
         mockIsWearerCall = encodeIsWearerCall(ownerHat);
