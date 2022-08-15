@@ -47,6 +47,8 @@ import "./Interfaces/IHats.sol";
 abstract contract HatsAccessControl is Context {
     error NotWearingRoleHat(bytes32 role, uint256 hat, address account);
 
+    error RoleAlreadyAssigned(bytes32 role, uint256 roleHat);
+
     event RoleGranted(
         bytes32 indexed role,
         uint256 indexed hat,
@@ -66,8 +68,14 @@ abstract contract HatsAccessControl is Context {
     );
 
     event HatsContractChanged(
-        address previousHatsContract,
-        address newHatsContract
+        address indexed previousHatsContract,
+        address indexed newHatsContract
+    );
+
+    event RoleHatChanged(
+        bytes32 indexed role,
+        uint256 indexed previousRoleHat,
+        uint256 indexed newRoleHat
     );
 
     struct RoleData {
@@ -158,6 +166,14 @@ abstract contract HatsAccessControl is Context {
         _grantRole(role, hat);
     }
 
+    function changeRoleHat(bytes32 role, uint256 newRoleHat)
+        public
+        virtual
+        onlyRole(getRoleAdmin(role))
+    {
+        _changeRoleHat(role, newRoleHat);
+    }
+
     /**
      * @dev Revokes `role` from `hat`.
      *
@@ -196,11 +212,22 @@ abstract contract HatsAccessControl is Context {
         _changeHatsContract(newHatsContract);
     }
 
-    function _changeHatsContract(address newHatsContract) public virtual {
+    function _changeHatsContract(address newHatsContract) internal virtual {
         address previousHatsContract = address(HATS);
         HATS = IHats(newHatsContract);
 
         emit HatsContractChanged(previousHatsContract, newHatsContract);
+    }
+
+    function _changeRoleHat(bytes32 role, uint256 newRoleHat) internal virtual {
+        uint256 roleHat = _roles[role].hat;
+        if (roleHat == 0) {
+            _grantRole(role, newRoleHat);
+        }
+        if (roleHat != newRoleHat) {
+            _roles[role].hat = newRoleHat;
+            emit RoleHatChanged(role, roleHat, newRoleHat);
+        }
     }
 
     /**
@@ -220,7 +247,11 @@ abstract contract HatsAccessControl is Context {
      * Internal function without access restriction.
      */
     function _grantRole(bytes32 role, uint256 hat) internal virtual {
-        if (_roles[role].hat != hat) {
+        uint256 roleHat = _roles[role].hat;
+        if (roleHat > 0) {
+            revert RoleAlreadyAssigned(role, roleHat);
+        }
+        if (roleHat != hat) {
             _roles[role].hat = hat;
             emit RoleGranted(role, hat, _msgSender());
         }

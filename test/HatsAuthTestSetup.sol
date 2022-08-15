@@ -56,4 +56,10 @@ contract HatsAccessControlTestObjects {
         address previousHatsContract,
         address newHatsContract
     );
+
+    event RoleHatChanged(
+        bytes32 indexed role,
+        uint256 indexed previousRoleHat,
+        uint256 indexed newRoleHat
+    );
 }
