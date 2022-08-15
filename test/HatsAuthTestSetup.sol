@@ -23,3 +23,37 @@ contract HatsAuthTestSetup is Test {
         ownerHat = uint256(1);
     }
 }
+
+contract HatsOwnedTestObjects {
+    event OwnerHatUpdated(
+        uint256 indexed ownerHat,
+        address indexed hatsContract
+    );
+}
+
+contract HatsAccessControlTestObjects {
+    error NotWearingRoleHat(bytes32 role, uint256 hat, address account);
+
+    event RoleGranted(
+        bytes32 indexed role,
+        uint256 indexed hat,
+        address indexed sender
+    );
+
+    event RoleRevoked(
+        bytes32 indexed role,
+        uint256 indexed hat,
+        address indexed sender
+    );
+
+    event RoleAdminChanged(
+        bytes32 indexed role,
+        bytes32 indexed previousAdminRole,
+        bytes32 indexed newAdminRole
+    );
+
+    event HatsContractChanged(
+        address previousHatsContract,
+        address newHatsContract
+    );
+}

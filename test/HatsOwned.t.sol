@@ -2,17 +2,12 @@
 pragma solidity >=0.8.0;
 
 import "./mocks/MockHatsOwned.sol";
-import "./HatsAuthTestSetup.sol";
+import {HatsAuthTestSetup, HatsOwnedTestObjects} from "./HatsAuthTestSetup.sol";
 
 // import "../src/Interfaces/IHats.sol";
 
-contract HatsOwnedTest is HatsAuthTestSetup {
+contract HatsOwnedTest is HatsAuthTestSetup, HatsOwnedTestObjects {
     MockHatsOwned mockHatsOwned;
-
-    event OwnerHatUpdated(
-        uint256 indexed ownerHat,
-        address indexed hatsContract
-    );
 
     function setUp() public override {
         super.setUp();
