@@ -2,7 +2,7 @@
 pragma solidity >=0.8.13;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "./Interfaces/IHats.sol";
+import "hats-protocol/IHats.sol";
 
 /**
  * @notice forked from OpeZeppelin (https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/AccessControl.sol)
