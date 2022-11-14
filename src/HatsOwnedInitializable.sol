@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CC0
 pragma solidity >=0.8.13;
 
-import "hats-protocol/IHats.sol";
 import "./HatsOwnedCommon.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
