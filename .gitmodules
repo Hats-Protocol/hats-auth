@@ -10,3 +10,4 @@
 [submodule "lib/hats-protocol"]
 	path = lib/hats-protocol
 	url = https://github.com/hats-protocol/hats-protocol
+	branch = beta

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CC0
 pragma solidity >=0.8.13;
 
-import "./Interfaces/IHats.sol";
+import "hats-protocol/IHats.sol";
 
 /// @notice Single owner authorization mixin using Hats Protocol
 /// @dev Common logic across initializable and standard versions
